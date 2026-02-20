@@ -21,6 +21,6 @@ server:
   port: 8080
 
 jwt:
-  secret: secret123
+  secret: my-super-secret-key-for-jwt-signing-1234567890
   access-expiration-ms: 900000
   refresh-expiration-ms: 604800000

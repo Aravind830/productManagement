@@ -4,6 +4,7 @@ import com.example.assignment.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,16 +16,13 @@ public class JwtUtil {
     @Value("$jwt.secret")
     private String SECRET;
 
-    @Value("$jwt.access-expiration-ms")
-    private String JWT_EXPIRATION_MS;
-
     public String generateAccessToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getUsername())
                 .claim("role", user.getRole().name())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(Long.parseLong(JWT_EXPIRATION_MS)))
-                .signWith(SignatureAlgorithm.HS256, SECRET)
+                .setExpiration(new Date((System.currentTimeMillis()+15*60*1000)))
+                .signWith(Keys.hmacShaKeyFor(SECRET.getBytes()))
                 .compact();
     }
 
@@ -38,7 +36,7 @@ public class JwtUtil {
 
     private Claims getClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET)
+                .setSigningKey(Keys.hmacShaKeyFor(SECRET.getBytes()))
                 .parseClaimsJws(token)
                 .getBody();
     }
